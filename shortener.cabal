@@ -14,7 +14,8 @@ library
   hs-source-dirs:
       src
   exposed-modules:
-      Shortener
+      Shortener,
+      Luhn
   build-depends:
       blaze-html >= 0.9,
       containers,

@@ -7,11 +7,13 @@ import Data.Foldable (for_)
 import Data.IORef (modifyIORef, newIORef, readIORef)
 import Data.Map (Map)
 import qualified Data.Map as M
-import Data.Text (Text)
+import Data.Text (Text, unpack)
 import qualified Data.Text.Lazy as LT
+import Luhn (validateLunh)
 import Text.Blaze.Html.Renderer.Text (renderHtml)
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
+import Text.Read (readMaybe)
 import Web.Scotty
 
 shortener :: IO ()
@@ -24,21 +26,21 @@ shortener = do
         renderHtml $
           H.html $
             H.body $ do
-              H.h1 "Shortener"
+              H.h1 "Credit Card Validation"
               H.form H.! A.method "post" H.! A.action "/" $ do
-                H.input H.! A.type_ "text" H.! A.name "url"
-                H.input H.! A.type_ "submit"
+                H.input H.! A.type_ "text" H.! A.name "number"
+                H.input H.! A.type_ "submit" H.! A.value "Validate"
               H.table $
                 for_ (M.toList urls) $ \(i, url) ->
                   H.tr $ do
                     H.td (H.toHtml i)
                     H.td (H.text url)
     post "/" $ do
-      url <- param "url"
+      number <- param "number"
       liftIO $
         modifyIORef urlsR $
           \(i, urls) ->
-            (i + 1, M.insert i url urls)
+            (i + 1, M.insert i (format number (validateText number)) urls)
       redirect "/"
     get "/:n" $ do
       n <- param "n"
@@ -48,3 +50,15 @@ shortener = do
           redirect (LT.fromStrict url)
         Nothing ->
           raise "not found"
+
+data Result = InvalidCard | ValidCard | InvalidInput
+
+validateText :: Text -> Result
+validateText a = case readMaybe $ unpack a of
+  Just myNumber -> if validateLunh myNumber then ValidCard else InvalidCard
+  Nothing -> InvalidInput
+
+format :: Text -> Result -> Text
+format myNumber InvalidCard = myNumber <> " Invalid!"
+format myNumber ValidCard = myNumber <> " Valid!"
+format myNumber InvalidInput = myNumber <> " Invalid Input!"
