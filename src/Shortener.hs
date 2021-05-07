@@ -51,16 +51,14 @@ shortener = do
         Nothing ->
           raise "not found"
 
-validateText :: Text -> Bool
+data Result = InvalidCard | ValidCard | InvalidInput
+
+validateText :: Text -> Result
 validateText a = case readMaybe $ unpack a of
-  Just myNumber -> validateLunh myNumber
-  Nothing -> False
+  Just myNumber -> if validateLunh myNumber then ValidCard else InvalidCard
+  Nothing -> InvalidInput
 
---maybe False validateLunh (readMaybe $ unpack a)
-
-format :: Text -> Bool -> Text
-format myNumber False = myNumber <> "Invalid!"
-format myNumber True = myNumber <> "Valid!"
-
----number Valid!
----number Invalid!
+format :: Text -> Result -> Text
+format myNumber InvalidCard = myNumber <> " Invalid!"
+format myNumber ValidCard = myNumber <> " Valid!"
+format myNumber InvalidInput = myNumber <> " Invalid Input!"
