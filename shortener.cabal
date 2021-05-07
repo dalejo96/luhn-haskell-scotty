@@ -1,0 +1,31 @@
+cabal-version: 2.2
+name: shortener
+version: 0.0.0.0
+common common
+  build-depends:
+      base >= 4.13
+  default-language:
+      Haskell2010
+  ghc-options:
+      -Wall
+library
+  import:
+      common
+  hs-source-dirs:
+      src
+  exposed-modules:
+      Shortener
+  build-depends:
+      blaze-html >= 0.9,
+      containers,
+      text,
+      scotty >= 0.11
+executable shortener
+  import:
+      common
+  hs-source-dirs:
+      app
+  main-is:
+      Main.hs
+  build-depends:
+      shortener
