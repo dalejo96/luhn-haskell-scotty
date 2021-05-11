@@ -54,13 +54,3 @@ format :: Text -> Result -> Text
 format myNumber InvalidCard = myNumber <> " Invalid!"
 format myNumber ValidCard = myNumber <> " Valid!"
 format myNumber InvalidInput = myNumber <> " Invalid Input!"
-
-{- data CreditCardError = InvalidCard1 | InvalidInput1
-
-mkCreditCard :: Text -> Either CreditCardError Text
-mkCreditCard a =
-  case readMaybe $ T.unpack a of
-    Just number
-      | validateLunh number -> Right number
-      | otherwise -> Left InvalidCard1
-    Nothing -> Left InvalidInput1 -}
