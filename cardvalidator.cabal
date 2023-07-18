@@ -1,6 +1,8 @@
 cabal-version: 2.2
-name: shortener
-version: 0.0.0.0
+name: cardvalidator
+version: 0.0.0.1
+synopsis: Validate card using luhn algorithm
+description: Some cool scotty implementation when you can validate your card using the luhn algorithm.
 common common
   build-depends:
       base >= 4.13
@@ -14,14 +16,14 @@ library
   hs-source-dirs:
       src
   exposed-modules:
-      Shortener,
+      ValidateCard,
       Luhn
   build-depends:
       blaze-html >= 0.9,
       containers,
       text,
       scotty >= 0.11
-executable shortener
+executable cardvalidator
   import:
       common
   hs-source-dirs:
@@ -29,4 +31,4 @@ executable shortener
   main-is:
       Main.hs
   build-depends:
-      shortener
+      cardvalidator

@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Shortener where
+module ValidateCard where
 
 import Control.Monad.IO.Class (MonadIO (liftIO))
 import Data.Foldable (for_)
@@ -16,8 +16,8 @@ import qualified Text.Blaze.Html5.Attributes as A
 import Text.Read (readMaybe)
 import Web.Scotty
 
-shortener :: IO ()
-shortener = do
+validateCard :: IO ()
+validateCard = do
   inputTexts <- newIORef (1 :: Int, mempty :: Map Int Text)
   scotty 3000 $ do
     get "/" $ do

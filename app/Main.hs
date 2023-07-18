@@ -1,7 +1,7 @@
 module Main (main) where
 
-import Shortener (shortener)
+import ValidateCard (validateCard)
 
 main :: IO ()
 main =
-  shortener
+  validateCard
