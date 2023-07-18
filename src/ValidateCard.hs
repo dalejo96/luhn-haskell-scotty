@@ -1,14 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Shortener where
+module ValidateCard where
 
 import Control.Monad.IO.Class (MonadIO (liftIO))
 import Data.Foldable (for_)
 import Data.IORef (modifyIORef, newIORef, readIORef)
 import Data.Map (Map)
 import qualified Data.Map as M
-import Data.Text (Text, unpack)
-import qualified Data.Text.Lazy as LT
+import Data.Text (Text)
+import qualified Data.Text as T
 import Luhn (validateLunh)
 import Text.Blaze.Html.Renderer.Text (renderHtml)
 import qualified Text.Blaze.Html5 as H
@@ -16,12 +16,12 @@ import qualified Text.Blaze.Html5.Attributes as A
 import Text.Read (readMaybe)
 import Web.Scotty
 
-shortener :: IO ()
-shortener = do
-  urlsR <- newIORef (1 :: Int, mempty :: Map Int Text)
+validateCard :: IO ()
+validateCard = do
+  inputTexts <- newIORef (1 :: Int, mempty :: Map Int Text)
   scotty 3000 $ do
     get "/" $ do
-      (_, urls) <- liftIO $ readIORef urlsR
+      (_, inputs) <- liftIO $ readIORef inputTexts
       html $
         renderHtml $
           H.html $
@@ -31,30 +31,22 @@ shortener = do
                 H.input H.! A.type_ "text" H.! A.name "number"
                 H.input H.! A.type_ "submit" H.! A.value "Validate"
               H.table $
-                for_ (M.toList urls) $ \(i, url) ->
+                for_ (M.toList inputs) $ \(i, numbers) ->
                   H.tr $ do
                     H.td (H.toHtml i)
-                    H.td (H.text url)
+                    H.td (H.text numbers)
     post "/" $ do
       number <- param "number"
       liftIO $
-        modifyIORef urlsR $
-          \(i, urls) ->
-            (i + 1, M.insert i (format number (validateText number)) urls)
+        modifyIORef inputTexts $
+          \(i, inputs) ->
+            (i + 1, M.insert i (format number (validateText number)) inputs)
       redirect "/"
-    get "/:n" $ do
-      n <- param "n"
-      (_, urls) <- liftIO $ readIORef urlsR
-      case M.lookup n urls of
-        Just url ->
-          redirect (LT.fromStrict url)
-        Nothing ->
-          raise "not found"
 
 data Result = InvalidCard | ValidCard | InvalidInput
 
 validateText :: Text -> Result
-validateText a = case readMaybe $ unpack a of
+validateText a = case readMaybe $ T.unpack a of
   Just myNumber -> if validateLunh myNumber then ValidCard else InvalidCard
   Nothing -> InvalidInput
 
